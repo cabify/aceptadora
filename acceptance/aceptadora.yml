@@ -1,0 +1,30 @@
+services:
+  redis:
+    # image has to be in the canonical format, i.e., an image called `redis` is actually docker.io/library/redis
+    image: docker.io/library/redis:3.0.7
+    # ports is a usual mapping like in docker compose, notice that depending on the env it will be mapped on the localhost
+    # or on whatever host is running the docker (like host `docker` in gitlab) so we don't bind the ports on 127.0.0.1
+    # if you're really concerned about security, an option would be to define a MAYBE_BIND_PORT in each of the env vars files as:
+    # linux.env/darwin.env: `MAYBE_BIND_PORT=127.0.0.1:` (ending with a colon)
+    # gitlab.env: `MAYBE_BIND_PORT=` [empty]
+    # and then bind ports as: `- ${MAYBE_BIND_PORTS}6379:6379`
+    ports:
+      - 6379:6379
+    # ignore_logs can be used to surpress the logs of some chatty containers
+    # you can still read them after the test has finished by running `docker logs redis`
+    ignore_logs: true
+
+  proxy:
+    image: docker.io/library/golang
+    ports:
+      - 8888:8888
+    # we can use ${YAMLDIR} to reference the files
+    env_file:
+      - ${YAMLDIR}/config/proxy.env
+    # binds mounts files or directories on the host machine to the container
+    # https://docs.docker.com/storage/bind-mounts/
+    # in this case we mount the actual golang code for the proxy dependency, but it could be a SQL schema for a mysql, etc.
+    binds:
+      - ${YAMLDIR}/fixtures/proxy:/go/proxy
+    # command has to be an array of strings
+    command: ["go", "run", "./proxy/main.go"]
