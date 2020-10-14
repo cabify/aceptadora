@@ -2,6 +2,7 @@ package aceptadora
 
 import (
 	"context"
+	"net"
 	"os"
 	"testing"
 	"time"
@@ -37,7 +38,10 @@ type Aceptadora struct {
 // New creates a new Aceptadora. It will try to load the YAML config from the path provided by Config
 // If something goes wrong, it will use testing.T to fail.
 func New(t *testing.T, cfg Config) *Aceptadora {
-	imagePuller := NewImagePuller(t, cfg.ImagePuller)
+	if _, ok := os.LookupEnv("TESTER_ADDRESS"); !ok {
+		os.Setenv("TESTER_ADDRESS", getLocalIP())
+	}
+
 	os.Setenv("YAMLDIR", cfg.YAMLDir)
 	yamlPath := cfg.YAMLDir + "/" + cfg.YAMLName
 	yaml, err := LoadYAML(yamlPath)
@@ -48,7 +52,7 @@ func New(t *testing.T, cfg Config) *Aceptadora {
 		require:     require.New(t),
 		cfg:         cfg,
 		yaml:        yaml,
-		imagePuller: imagePuller,
+		imagePuller: NewImagePuller(t, cfg.ImagePuller),
 		services:    map[string]*Runner{},
 	}
 }
@@ -103,4 +107,21 @@ func (a *Aceptadora) Stop(ctx context.Context, name string) {
 	err := svc.Stop(ctx)
 	assert.NoError(a.t, err, "Can't stop service %q in time: %s", err)
 	a.services[name] = nil
+}
+
+// getLocalIP returns the non loopback local IP of the host
+func getLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ""
+	}
+	for _, address := range addrs {
+		// check the address type and if it is not a loopback the display it
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
 }

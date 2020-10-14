@@ -26,6 +26,19 @@ func SetEnv(t *testing.T, pathForEnv ...func() (string, bool)) {
 	}
 }
 
+// OneOfEnvConfigs provides a matcher that returns as the result the result of the first matching matcher.
+// Useful when several matchers would match, like for instance a Github Actions environment is being a Linux at the same time.
+func OneOfEnvConfigs(matchers ...func() (string, bool)) func() (string, bool) {
+	return func() (string, bool) {
+		for _, match := range matchers {
+			if path, matches := match(); matches {
+				return path, true
+			}
+		}
+		return "", false
+	}
+}
+
 // EnvConfigPathForDarwin is a matcher for SetEnv that matches Mac environments, we use the home directory prefix instead
 // of OSTYPE as it isn't defined when running tests from Goland
 func EnvConfigPathForDarwin(path string) func() (string, bool) {
@@ -35,10 +48,10 @@ func EnvConfigPathForDarwin(path string) func() (string, bool) {
 	}
 }
 
-// EnvConfigPathForGitlab is a matcher for SetEnv that matches Gitlab environments (having GITLAB_CI env var)
-func EnvConfigPathForGitlab(path string) func() (string, bool) {
+// EnvConfigWhenEnvVarPresent is a matcher for SetEnv that matches when the provided env var name is present
+func EnvConfigWhenEnvVarPresent(path, envVarName string) func() (string, bool) {
 	return func() (string, bool) {
-		_, isGitlab := os.LookupEnv("GITLAB_CI")
+		_, isGitlab := os.LookupEnv(envVarName)
 		return path, isGitlab
 	}
 }
