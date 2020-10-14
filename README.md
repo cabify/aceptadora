@@ -24,12 +24,13 @@ Everything in aceptadora accepts `t *testing.T` and everything does `require.NoE
 
 In order to handle multiple environments there are some stages in config loading. Notice that all the configs loaded expand the env vars set by `${VAR}` to their values from what's already loaded.
 
-First, we load some very basic env-dependant config, deciding on env vars to load a local or gitlab config (we're using `darwin` instead of `local` since someone may want to init a `linux` config too). 
+First, we load some very basic env-dependant config, deciding on env vars to load a local or gitlab config. 
 This configuration mostly provides details about networking setup:
-- Where can acceptance-tester reach the services? On Mac this would be `localhost` but on Gitlab it's `docker`
-- Where can services reach the acceptance-tester? On Mac it's `docker.for.mac.localhost`, on Linux it would be `localhost` and on Gitlab it's the IP address of the docker running the test itself. 
-  In order to evaluate the IP address of the test runner on Gitlab we perform some previous checks in `scripts/acceptance.sh`.
-  
+- Where can acceptance-tester reach the services? 
+  Usually this would be `localhost`, but on Gitlab it's `docker` as we're running `dind`.
+- Where can services reach the acceptance-tester? This will be set to the first local non-loopback IP address in the environment variable called `TESTER_ADDRESS`.
+  You can set this variable to something more specific before running the test too, in which case it won't be overwritten. 
+
 One may wonder: why don't we just decide all of that in `scripts/acceptance.sh`? 
 The answer is that deciding that from the test itself allows us running the tests from any IDE as a normal test, instead of having a proxy script. 
 Of course loading some env vars would work, but since `aceptadora` can do this for you, why should we care?

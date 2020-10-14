@@ -35,8 +35,10 @@ type acceptanceSuite struct {
 func (s *acceptanceSuite) SetupSuite() {
 	aceptadora.SetEnv(
 		s.T(),
-		aceptadora.EnvConfigPathForDarwin("../config/darwin.env"),
-		aceptadora.EnvConfigPathForGitlab("../config/gitlab.env"),
+		aceptadora.OneOfEnvConfigs(
+			aceptadora.EnvConfigWhenEnvVarPresent("../config/gitlab.env", "GITLAB_CI"),
+			aceptadora.EnvConfigCommon("../config/default.env"),
+		),
 		aceptadora.EnvConfigCommon("acceptance.env"),
 	)
 	s.Require().NoError(envconfig.Process("ACCEPTANCE", &s.cfg))

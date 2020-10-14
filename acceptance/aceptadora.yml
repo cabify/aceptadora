@@ -5,7 +5,7 @@ services:
     # ports is a usual mapping like in docker compose, notice that depending on the env it will be mapped on the localhost
     # or on whatever host is running the docker (like host `docker` in gitlab) so we don't bind the ports on 127.0.0.1
     # if you're really concerned about security, an option would be to define a MAYBE_BIND_PORT in each of the env vars files as:
-    # linux.env/darwin.env: `MAYBE_BIND_PORT=127.0.0.1:` (ending with a colon)
+    # default.env: `MAYBE_BIND_PORT=127.0.0.1:` (ending with a colon)
     # gitlab.env: `MAYBE_BIND_PORT=` [empty]
     # and then bind ports as: `- ${MAYBE_BIND_PORTS}6379:6379`
     ports:
