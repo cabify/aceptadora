@@ -1,0 +1,10 @@
+language: go
+
+services:
+  - docker
+
+env:
+  - GO111MODULE=on
+
+script:
+  - make acceptance
