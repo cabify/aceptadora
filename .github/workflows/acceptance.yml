@@ -10,9 +10,15 @@ on:
 jobs:
   acceptance:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version:
+          - '~1.13'
+          - '~1.14'
+          - '~1.15'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: '^1.14'
+          go-version: ${{ matrix.go-version }}
       - run: make acceptance
