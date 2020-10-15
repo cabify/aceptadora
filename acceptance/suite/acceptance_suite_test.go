@@ -37,9 +37,9 @@ func (s *acceptanceSuite) SetupSuite() {
 		s.T(),
 		aceptadora.OneOfEnvConfigs(
 			aceptadora.EnvConfigWhenEnvVarPresent("../config/gitlab.env", "GITLAB_CI"),
-			aceptadora.EnvConfigCommon("../config/default.env"),
+			aceptadora.EnvConfigAlways("../config/default.env"),
 		),
-		aceptadora.EnvConfigCommon("acceptance.env"),
+		aceptadora.EnvConfigAlways("acceptance.env"),
 	)
 	s.Require().NoError(envconfig.Process("ACCEPTANCE", &s.cfg))
 
