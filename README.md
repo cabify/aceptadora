@@ -8,7 +8,38 @@ Aceptadora provides the boilerplate to orchestrate the containers around an acce
 
 Aceptadora is a replacement for `docker-compose` in acceptance tests, and it also allows running and debugging tests from your IDE.
 
-The acceptance tests of this package are an example of usage for this package.
+# Example
+
+The [acceptance tests](./acceptance/suite/acceptance_suite_test.go) of this package are an example of usage for this package. There are also CI builds running on both [Github Actions](.github/workflows/acceptance.yml) and [Travis CI](./.travis.yml) that serve as an example.
+
+Long story short:
+ - Define your service in a YAML file inspired by docker-compose format, with an idiomatic name of [`aceptadora.yml`](./acceptance/aceptadora.yml)
+ - Define your environment variables in [some `config.env` files](./acceptance/config.env)
+ - Load them in your test:
+ ```go
+	aceptadora.SetEnv(
+		s.T(),
+		aceptadora.OneOfEnvConfigs(
+			aceptadora.EnvConfigWhenEnvVarPresent("../config/gitlab.env", "GITLAB_CI"),
+			aceptadora.EnvConfigAlways("../config/default.env"),
+		),
+		aceptadora.EnvConfigAlways("acceptance.env"),
+	) 
+ ```
+ - Fill the [`aceptadora.Config`](./aceptadora.go) values, you can use `github.com/colega/envconfig` for that
+ ```go
+	envconfig.MustProcess("ACCEPTANCE", &s.cfg)
+ ``` 
+ - Instantiate the _aceptadora_:
+ ```go
+	aceptadora := aceptadora.New(t, cfg)
+ ```
+ - Start your service:
+ ```go
+	aceptadora.Run(ctx, "redis")
+ ```
+ - Test stuff
+ - When you're done, stop it using `aceptadora.StopAll(ctx)` or `aceptadora.Stop(ctx, "redis")`
 
 # Motivations
 
