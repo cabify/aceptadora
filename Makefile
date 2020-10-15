@@ -7,4 +7,4 @@ help: ## Show this help
 ##
 ### Code validation
 acceptance: ## Run golang acceptance tests
-	@bash scripts/acceptance.sh
+	@(cd acceptance && go test -v -count=1 ./...)
