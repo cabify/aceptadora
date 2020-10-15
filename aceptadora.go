@@ -17,9 +17,6 @@ type Config struct {
 	YAMLName string `default:"aceptadora.yml"`
 
 	ImagePuller ImagePullerConfig
-
-	HTTPWaitRequestInterval time.Duration `default:"50ms"`
-	TCPWaitRequestInterval  time.Duration `default:"50ms"`
 }
 
 type Aceptadora struct {
