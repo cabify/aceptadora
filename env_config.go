@@ -13,8 +13,8 @@ import (
 // SetEnv loads the configuration from a file, choosing the proper one depending on the provided matchers.
 // Every matcher returning true as second value will be executed.
 // Matchers are executed in their provided order
-func SetEnv(t *testing.T, pathForEnv ...func() (string, bool)) {
-	for _, f := range pathForEnv {
+func SetEnv(t *testing.T, matchers ...ConfigPathMatcher) {
+	for _, f := range matchers {
 		if path, shouldBeUsed := f(); shouldBeUsed {
 			env, err := loadConfigFromFile(path)
 			require.NoError(t, err, "Can't load config from %s: %s", path, err)
@@ -26,9 +26,11 @@ func SetEnv(t *testing.T, pathForEnv ...func() (string, bool)) {
 	}
 }
 
+type ConfigPathMatcher func() (path string, use bool)
+
 // OneOfEnvConfigs provides a matcher that returns as the result the result of the first matching matcher.
 // Useful when several matchers would match, like for instance a Github Actions environment is being a Linux at the same time.
-func OneOfEnvConfigs(matchers ...func() (string, bool)) func() (string, bool) {
+func OneOfEnvConfigs(matchers ...ConfigPathMatcher) ConfigPathMatcher {
 	return func() (string, bool) {
 		for _, match := range matchers {
 			if path, matches := match(); matches {
@@ -39,26 +41,17 @@ func OneOfEnvConfigs(matchers ...func() (string, bool)) func() (string, bool) {
 	}
 }
 
-// EnvConfigPathForDarwin is a matcher for SetEnv that matches Mac environments, we use the home directory prefix instead
-// of OSTYPE as it isn't defined when running tests from Goland
-func EnvConfigPathForDarwin(path string) func() (string, bool) {
-	return func() (string, bool) {
-		isMac := strings.HasPrefix(os.Getenv("HOME"), "/Users/")
-		return path, isMac
-	}
-}
-
 // EnvConfigWhenEnvVarPresent is a matcher for SetEnv that matches when the provided env var name is present
-func EnvConfigWhenEnvVarPresent(path, envVarName string) func() (string, bool) {
+func EnvConfigWhenEnvVarPresent(path, envVarName string) ConfigPathMatcher {
 	return func() (string, bool) {
 		_, isGitlab := os.LookupEnv(envVarName)
 		return path, isGitlab
 	}
 }
 
-// EnvConfigCommon is a matcher for SetEnv that is always true, useful to load the common acceptance.env config once
+// EnvConfigAlways is a matcher for SetEnv that is always true, useful to load the common acceptance.env config once
 // the env-specifics are loaded.
-func EnvConfigCommon(path string) func() (string, bool) {
+func EnvConfigAlways(path string) ConfigPathMatcher {
 	return func() (string, bool) {
 		return path, true
 	}
