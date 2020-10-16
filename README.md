@@ -80,3 +80,11 @@ Here `aceptadora.New()` would load the `aceptadora.yml` file from the provided d
 Finally, we run services by just running `aceptadora.Run(ctx, "svc-name-in-the-yaml")`.
 
 Aceptadora will also take care of stopping the services, you can call `aceptadora.Stop(ctx, svcName)` to stop one of them, or `StopAll(ctx)` to stop all the (still running) services.
+
+# Unit tests
+
+This package doesn't have unit tests. 
+All the testing is performed by the example itself in the acceptance tests folder. 
+The unit tests would require either defining interfaces for the functionality that docker provides and mocking them, which would overcomplicate the code without offering enough value in exchange, or testing using the docker real docker API, which is already covered by the acceptance tests.
+However, this is opinionated. 
+Feel free to disagree, open us an issue with your proposal, or even better, a pull request.
