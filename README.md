@@ -43,7 +43,7 @@ Long story short:
 
 # Motivations
 
-We've been using `docker-compose` for acceptance tests for a long time, and while this approach did have issues[^1] we lived with it until the introduction of gRPC. 
+We've been using `docker-compose` for acceptance tests for a long time, and while this approach did have issues (since test subjects and dependencies were not restarted between tests, we had to have some suites depending on other ones, which made the tests flaky and slow) we lived with it until the introduction of gRPC. 
 Once we started playing with gRPC we found an issue: the gRPC golang client tries to connect to the service when the service is started, and if it fails, it will keep returning that error for a while. 
 Since we started our test subjects before the acceptance-tester in the former approach, our test subjects failed to call the mocked gRPC servers on the acceptance-tester.
 
@@ -80,5 +80,3 @@ Here `aceptadora.New()` would load the `aceptadora.yml` file from the provided d
 Finally, we run services by just running `aceptadora.Run(ctx, "svc-name-in-the-yaml")`.
 
 Aceptadora will also take care of stopping the services, you can call `aceptadora.Stop(ctx, svcName)` to stop one of them, or `StopAll(ctx)` to stop all the (still running) services.
-
-[^1]: With `docker-compose` approach, test subjects and dependencies were not restarted between tests, so we had to have some suites depending on other ones, which made the tests flaky and slow.
