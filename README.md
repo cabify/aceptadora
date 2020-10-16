@@ -66,9 +66,10 @@ This configuration mostly provides details about networking setup:
 - Where can services reach the acceptance-tester? This will be set to the first local non-loopback IP address in the environment variable called `TESTER_ADDRESS`.
   You can set this variable to something more specific before running the test too, in which case it won't be overwritten. 
 
-One may wonder: why don't we just decide all of that in `scripts/acceptance.sh`? 
+One may wonder: why don't we just decide all of that in some kind of test-loading shellscript? 
 The answer is that deciding that from the test itself allows us running the tests from any IDE as a normal test, instead of having a proxy script. 
 Of course loading some env vars would work, but since `aceptadora` can do this for you, why should we care?
+This way we can make sure that test running is portable and doesn't require any external dependencies.
 
 Then we load more env configs for the test itself, usually `acceptance.env`, which tells the acceptance test where the `aceptadora.yml` file is located, and how images from different docker registries are pulled.
 Notice that `acceptance.env` can be specific to each suite you may have if their paths are different. 
