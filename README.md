@@ -4,7 +4,7 @@
 ![acceptance](https://github.com/cabify/aceptadora/workflows/acceptance/badge.svg)
 [![Travis build status](https://travis-ci.com/cabify/aceptadora.svg?branch=master)](https://travis-ci.com/cabify/aceptadora)
 
-Aceptadora provides the boilerplate to orchestrate the containers around an acceptance test.
+Aceptadora provides the boilerplate to orchestrate the containers for an acceptance test.
 
 Aceptadora is a replacement for `docker-compose` in acceptance tests, and it also allows running and debugging tests from your IDE.
 
