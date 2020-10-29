@@ -51,6 +51,8 @@ So, we created a library that restarted our test subject interacting with `docke
 
 Then, we found the need to restart multiple test subjects plus the complexity of having to handle two kinds of configurations (`docker-compose` for dependencies and `aceptadora` for test subjects) so we decided to extend the functionality of `aceptadora` to completely replace the `docker-compose` and allow managing the lifecycle of all dependencies from the test.
 
+You can read [the full story on Medium](https://medium.com/cabify-product/acceptance-testing-go-services-using-aceptadora-428254c34d56).
+
 # Decisions
 
 Everything in aceptadora accepts `t *testing.T` and everything does `require.NoError(t, err)` because in tests nobody's going to handle the errors anyway, so we apply a fail-fast strategy, removing the retured errors and keeping the API clean for clearer acceptance tests.
