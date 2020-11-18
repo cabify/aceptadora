@@ -89,7 +89,7 @@ func (i *ImagePullerImpl) tryPullImage(ctx context.Context, imageName string) er
 
 	var authStr string
 	if ok {
-		encodedJSON, err := json.Marshal(repoCfg)
+		encodedJSON, err := json.Marshal(repoCfg.Auth)
 		if err != nil {
 			return fmt.Errorf("encoding JSON auth: %v", err)
 		}
