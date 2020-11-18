@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2020-11-18
+### Fixed
+- `ImagePuller` authentication.
+
 ## [0.2.0] - 2020-11-18
 ### Changed
 - BREAKING: `aceptadora.New()` now accepts an `ImagePuller` instead of creating it, and `aceptadora.Config` no longer contains the `aceptadora.ImagePullerConfig`.
