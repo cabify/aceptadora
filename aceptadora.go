@@ -15,8 +15,6 @@ import (
 type Config struct {
 	YAMLDir  string `default:"./"`
 	YAMLName string `default:"aceptadora.yml"`
-
-	ImagePuller ImagePullerConfig
 }
 
 type Aceptadora struct {
@@ -34,7 +32,7 @@ type Aceptadora struct {
 
 // New creates a new Aceptadora. It will try to load the YAML config from the path provided by Config
 // If something goes wrong, it will use testing.T to fail.
-func New(t *testing.T, cfg Config) *Aceptadora {
+func New(t *testing.T, imagePuller ImagePuller, cfg Config) *Aceptadora {
 	if _, ok := os.LookupEnv("TESTER_ADDRESS"); !ok {
 		os.Setenv("TESTER_ADDRESS", getLocalIP())
 	}
@@ -49,7 +47,7 @@ func New(t *testing.T, cfg Config) *Aceptadora {
 		require:     require.New(t),
 		cfg:         cfg,
 		yaml:        yaml,
-		imagePuller: NewImagePuller(t, cfg.ImagePuller),
+		imagePuller: imagePuller,
 		services:    map[string]*Runner{},
 	}
 }
