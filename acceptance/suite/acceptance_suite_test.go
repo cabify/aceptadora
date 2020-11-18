@@ -16,7 +16,8 @@ import (
 const expectedMockedDependencyInventedHTTPStatusCode = 288
 
 type Config struct {
-	Aceptadora aceptadora.Config
+	Aceptadora  aceptadora.Config
+	ImagePuller aceptadora.ImagePullerConfig
 
 	// ServicesAddress is the address where services started by aceptadora can be found
 	// It differs from env to env, and it's set up in env-specific configs
@@ -46,7 +47,8 @@ func (s *acceptanceSuite) SetupSuite() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	s.aceptadora = aceptadora.New(s.T(), s.cfg.Aceptadora)
+	imagePuller := aceptadora.NewImagePuller(s.T(), s.cfg.ImagePuller)
+	s.aceptadora = aceptadora.New(s.T(), imagePuller, s.cfg.Aceptadora)
 	s.aceptadora.PullImages(ctx)
 
 	s.startMockedProxyDependency()
