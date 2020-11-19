@@ -8,6 +8,7 @@ import (
 	"io"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/api/types"
@@ -75,6 +76,7 @@ type image struct {
 }
 
 func (i *ImagePullerImpl) tryPullImage(ctx context.Context, imageName string) error {
+	t0 := time.Now()
 	ref, err := reference.ParseNamed(imageName)
 	if err != nil {
 		return fmt.Errorf("can't parse image name %q: %w", imageName, err)
@@ -106,6 +108,8 @@ func (i *ImagePullerImpl) tryPullImage(ctx context.Context, imageName string) er
 		return fmt.Errorf("can't pull image %s: %v", imageName, err)
 	}
 	defer out.Close()
+
+	i.t.Logf("Pulled image %q in %s", imageName, time.Since(t0))
 
 	_, _ = io.Copy(
 		testLogsWriter{i.t, fmt.Sprintf("Image %q puller", imageName)},

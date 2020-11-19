@@ -5,7 +5,6 @@ import (
 	"net"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -56,10 +55,8 @@ func New(t *testing.T, imagePuller ImagePuller, cfg Config) *Aceptadora {
 // This allows doing this outside of the context of the test, and avoid unrelated flaky timeouts in the tests
 // happening when most of the context has been consumed by pulling the image
 func (a *Aceptadora) PullImages(ctx context.Context) {
-	for svcName, svc := range a.yaml.Services {
-		t0 := time.Now()
+	for _, svc := range a.yaml.Services {
 		a.imagePuller.Pull(ctx, svc.Image)
-		a.t.Logf("Pulled image %q for %q in %s", svc.Image, svcName, time.Since(t0))
 	}
 }
 
