@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -144,12 +145,22 @@ func (r *Runner) attachAndStreamLogs(ctx context.Context) {
 	r.logsStreamDoneCh = r.streamLogs(r.response)
 }
 
+// Stop will try to stop the container within the context provided.
 func (r *Runner) Stop(ctx context.Context) error {
+	return r.stop(ctx, nil)
+}
+
+// StopWithTimeout will stop the containers within the given timeout, if 0 it's just a force stop.
+func (r *Runner) StopWithTimeout(ctx context.Context, timeout time.Duration) error {
+	return r.stop(ctx, &timeout)
+}
+
+func (r *Runner) stop(ctx context.Context, timeout *time.Duration) error {
 	if r == nil || r.client == nil {
 		// nothing to stop
 		return nil
 	}
-	if err := r.client.ContainerStop(ctx, r.container.ID, nil); err != nil {
+	if err := r.client.ContainerStop(ctx, r.container.ID, timeout); err != nil {
 		r.t.Errorf("Error stopping container %s: %v", r.container.ID, err)
 	}
 

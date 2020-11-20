@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,6 +15,10 @@ import (
 type Config struct {
 	YAMLDir  string `default:"./"`
 	YAMLName string `default:"aceptadora.yml"`
+
+	// StopTimeout will be used to stop containers gracefully.
+	// If zero (default), then containers will be forced to stop immediately saving some tear down time.
+	StopTimeout time.Duration `default:"0s"`
 }
 
 type Aceptadora struct {
@@ -96,7 +101,7 @@ func (a *Aceptadora) Stop(ctx context.Context, name string) {
 		return
 	}
 
-	err := svc.Stop(ctx)
+	err := svc.StopWithTimeout(ctx, a.cfg.StopTimeout)
 	assert.NoError(a.t, err, "Can't stop service %q in time: %s", err)
 	a.services[name] = nil
 }
