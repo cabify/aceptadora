@@ -14,7 +14,7 @@ The [acceptance tests](./acceptance/suite/acceptance_suite_test.go) of this pack
 
 Long story short:
  - Define your service in a YAML file inspired by docker-compose format, with an idiomatic name of [`aceptadora.yml`](./acceptance/aceptadora.yml)
- - Define your environment variables in [some `config.env` files](./acceptance/config.env)
+ - Define your environment variables in [some `config.env` files](./acceptance/config/)
  - Load them in your test:
  ```go
 	aceptadora.SetEnv(
