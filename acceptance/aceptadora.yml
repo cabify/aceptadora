@@ -1,7 +1,7 @@
 services:
   redis:
     # image has to be in the canonical format, i.e., an image called `redis` is actually docker.io/library/redis
-    image: docker.io/library/redis:3.0.7
+    image: docker.io/library/redis:6.0.20
     # ports is a usual mapping like in docker compose, notice that depending on the env it will be mapped on the localhost
     # or on whatever host is running the docker (like host `docker` in gitlab) so we don't bind the ports on 127.0.0.1
     # if you're really concerned about security, an option would be to define a MAYBE_BIND_PORT in each of the env vars files as:
