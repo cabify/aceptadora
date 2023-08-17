@@ -28,7 +28,7 @@ type Runner struct {
 
 	// docker stuff
 	client           *client.Client
-	container        container.ContainerCreateCreatedBody
+	container        container.CreateResponse
 	response         types.HijackedResponse
 	logsStreamDoneCh <-chan error
 }
@@ -111,6 +111,7 @@ func (r *Runner) createContainer(ctx context.Context) {
 			Binds:        r.svc.Binds,
 		},
 		nil,
+		nil,
 		r.name,
 	)
 	r.require.NoError(err, "Can't create container %q: %s", r.name, err)
@@ -122,7 +123,7 @@ func (r *Runner) networkConnect(ctx context.Context) {
 		network = DefaultNetwork
 	}
 
-	if _, err := r.client.NetworkInspect(ctx, network); err != nil && client.IsErrNotFound(err) {
+	if _, err := r.client.NetworkInspect(ctx, network, types.NetworkInspectOptions{}); err != nil && client.IsErrNotFound(err) {
 		_, err := r.client.NetworkCreate(ctx, network, types.NetworkCreate{})
 		r.require.NoError(err, "Can't create network %q for container %q: %s", network, r.name, err)
 	}
@@ -160,7 +161,10 @@ func (r *Runner) stop(ctx context.Context, timeout *time.Duration) error {
 		// nothing to stop
 		return nil
 	}
-	if err := r.client.ContainerStop(ctx, r.container.ID, timeout); err != nil {
+
+	timeoutSeconds := int(timeout.Seconds())
+	stopOpts := container.StopOptions{Timeout: &timeoutSeconds}
+	if err := r.client.ContainerStop(ctx, r.container.ID, stopOpts); err != nil {
 		r.t.Errorf("Error stopping container %s: %v", r.container.ID, err)
 	}
 

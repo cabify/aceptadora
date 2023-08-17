@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2023-07-26
+### Update
+- Update `docker/docker` version
+
 ## [0.3.0] - 2020-11-20
 ### Added
 - `Runner.StopWithTimeout` and `Config.StopTimeout` to stop containers within the provided time, 0 by default to reduce the tear down time.
