@@ -2,7 +2,7 @@ package aceptadora
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -29,7 +29,13 @@ type Service struct {
 // LoadYAML reads the aceptadora.yml config, expanding the env var references to their values.
 func LoadYAML(filename string) (YAML, error) {
 	cfg := YAML{}
-	data, err := ioutil.ReadFile(filename)
+	file, err := os.Open(filename)
+	if err != nil {
+		return cfg, fmt.Errorf("can't open file: %w", err)
+	}
+	defer file.Close()
+
+	data, err := io.ReadAll(file)
 	if err != nil {
 		return cfg, fmt.Errorf("can't read file: %w", err)
 	}

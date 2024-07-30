@@ -10,8 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/distribution/reference"
-	"github.com/docker/docker/api/types"
+	"github.com/distribution/reference"
+	imagetype "github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
 	"github.com/stretchr/testify/require"
 )
@@ -31,7 +32,7 @@ type RepositoryConfig struct {
 
 	// Auth provides the default docker library's field to authenticate and will be used for pulling.
 	// Usually Username & Password fields should be filled.
-	Auth types.AuthConfig
+	Auth registry.AuthConfig
 }
 
 func NewImagePuller(t *testing.T, cfg ImagePullerConfig) *ImagePullerImpl {
@@ -98,12 +99,12 @@ func (i *ImagePullerImpl) tryPullImage(ctx context.Context, imageName string) er
 		authStr = base64.URLEncoding.EncodeToString(encodedJSON)
 	}
 
-	cli, err := client.NewEnvClient()
+	cli, err := client.NewClientWithOpts()
 	if err != nil {
 		return fmt.Errorf("creating docker client: %v", err)
 	}
 
-	out, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions{RegistryAuth: authStr})
+	out, err := cli.ImagePull(ctx, imageName, imagetype.PullOptions{RegistryAuth: authStr})
 	if err != nil {
 		return fmt.Errorf("can't pull image %s: %v", imageName, err)
 	}
