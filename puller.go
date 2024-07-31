@@ -99,7 +99,7 @@ func (i *ImagePullerImpl) tryPullImage(ctx context.Context, imageName string) er
 		authStr = base64.URLEncoding.EncodeToString(encodedJSON)
 	}
 
-	cli, err := client.NewClientWithOpts()
+	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return fmt.Errorf("creating docker client: %v", err)
 	}
