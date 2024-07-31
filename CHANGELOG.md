@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2024-07-31
+### Update
+- Bump `docker/docker` to `v26.1.4`
+
 ## [0.5.0] - 2024-07-30
 ### Update
 - BREAKING: Update `docker/docker` version. `RepositoryConfig.Auth` is now a `registry.AuthConfig` instead of `types.AuthConfig`.
