@@ -57,20 +57,20 @@ func (r *Runner) Start(ctx context.Context) {
 }
 
 func (r *Runner) startContainer(ctx context.Context) {
-	err := r.client.ContainerStart(ctx, r.container.ID, types.ContainerStartOptions{})
+	err := r.client.ContainerStart(ctx, r.container.ID, container.StartOptions{})
 	r.require.NoError(err, "Can't start container %q for %q: %s", r.container.ID, r.name, err)
 }
 
 func (r *Runner) createDockerClient() {
 	var err error
-	r.client, err = client.NewEnvClient()
+	r.client, err = client.NewClientWithOpts()
 	r.require.NoError(err, "Unable to create a docker client: %v", err)
 }
 
 func (r *Runner) stopExisting(ctx context.Context) {
 	listFilters := filters.NewArgs()
 	listFilters.Add("name", r.name+"$")
-	existing, _ := r.client.ContainerList(ctx, types.ContainerListOptions{
+	existing, _ := r.client.ContainerList(ctx, container.ListOptions{
 		All:     true,
 		Filters: listFilters,
 	})
@@ -78,7 +78,7 @@ func (r *Runner) stopExisting(ctx context.Context) {
 	for _, c := range existing {
 		r.t.Logf("Removing container %s:%s", c.Names[0], c.ID)
 		if err := r.client.ContainerRemove(ctx, c.ID,
-			types.ContainerRemoveOptions{
+			container.RemoveOptions{
 				RemoveVolumes: true,
 				Force:         true,
 			}); err != nil {
@@ -136,7 +136,7 @@ func (r *Runner) attachAndStreamLogs(ctx context.Context) {
 		return
 	}
 	var err error
-	r.response, err = r.client.ContainerAttach(ctx, r.container.ID, types.ContainerAttachOptions{
+	r.response, err = r.client.ContainerAttach(ctx, r.container.ID, container.AttachOptions{
 		Stream: true,
 		Stdout: true,
 		Stderr: true,
