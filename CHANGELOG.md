@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2024-07-31
+### Fixed
+- Use `client.FromEnv` when creating docker client
+
 ## [0.5.1] - 2024-07-31
 ### Update
 - Bump `docker/docker` to `v26.1.4`

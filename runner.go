@@ -63,7 +63,7 @@ func (r *Runner) startContainer(ctx context.Context) {
 
 func (r *Runner) createDockerClient() {
 	var err error
-	r.client, err = client.NewClientWithOpts()
+	r.client, err = client.NewClientWithOpts(client.FromEnv)
 	r.require.NoError(err, "Unable to create a docker client: %v", err)
 }
 
