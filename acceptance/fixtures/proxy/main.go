@@ -7,15 +7,21 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"time"
 )
 
 // This is a dummy reverse proxy to illustrate how our services can access the acceptance tester
 func main() {
 	port := os.Getenv("PROXY_PORT")
 	targetURLRaw := os.Getenv("PROXY_TARGETURL")
+	startedAt := time.Now()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/status", func(rw http.ResponseWriter, _ *http.Request) {
+		_, err := rw.Write([]byte(fmt.Sprintf("{\"started_at\": %v}", startedAt.UnixMilli())))
+		if err != nil {
+			return
+		}
 		rw.WriteHeader(http.StatusOK)
 	})
 

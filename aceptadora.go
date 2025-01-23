@@ -19,6 +19,9 @@ type Config struct {
 	// StopTimeout will be used to stop containers gracefully.
 	// If zero (default), then containers will be forced to stop immediately saving some tear down time.
 	StopTimeout time.Duration `default:"0s"`
+
+	// RestartTimeout will be used to restart containers gracefully.
+	RestartTimeout time.Duration `default:"10s"`
 }
 
 type Aceptadora struct {
@@ -78,6 +81,15 @@ func (a *Aceptadora) Run(ctx context.Context, name string) {
 	runner.Start(ctx)
 	a.services[name] = runner
 	a.order = append(a.order, name)
+}
+
+// Restart will restart the service with the name provided
+func (a *Aceptadora) Restart(ctx context.Context, name string) {
+	svc, ok := a.services[name]
+	if !ok {
+		a.t.Fatalf("There's no service %q to restart", name)
+	}
+	svc.RestartWithTimeout(ctx, a.cfg.RestartTimeout)
 }
 
 // StopAll will stop all the services in the reverse order
