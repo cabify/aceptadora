@@ -146,6 +146,21 @@ func (r *Runner) attachAndStreamLogs(ctx context.Context) {
 	r.logsStreamDoneCh = r.streamLogs(r.response)
 }
 
+// RestartWithTimeout will restart the container within the context provided and the timeout given.
+func (r *Runner) RestartWithTimeout(ctx context.Context, timeout time.Duration) {
+	if r.client == nil {
+		// nothing to restart
+		return
+	}
+
+	timeoutSeconds := int(timeout.Seconds())
+	stopOpts := container.StopOptions{Timeout: &timeoutSeconds}
+	if err := r.client.ContainerRestart(ctx, r.container.ID, stopOpts); err != nil {
+		r.t.Errorf("Error restarting container %s: %v", r.container.ID, err)
+	}
+	r.t.Logf("Container %q restarted with ID %q", r.name, r.container.ID)
+}
+
 // Stop will try to stop the container within the context provided.
 func (r *Runner) Stop(ctx context.Context) error {
 	return r.stop(ctx, nil)

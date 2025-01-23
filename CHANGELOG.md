@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-01-23
+### Added
+- Ability to restart containers
+
 ## [0.5.4] - 2024-09-02
 ### Update
 - Bump `docker/docker` to `v27.2.0`

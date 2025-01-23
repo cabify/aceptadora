@@ -2,7 +2,9 @@ package suite
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"testing"
@@ -71,6 +73,22 @@ func (s *acceptanceSuite) TestProxyCall() {
 	s.Require().Equal(expectedMockedDependencyInventedHTTPStatusCode, resp.StatusCode)
 }
 
+func (s *acceptanceSuite) TestProxyCallAfterRestart() {
+	startTimeBefore, err := s.getStartTime()
+	s.Require().NoError(err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	s.aceptadora.Restart(ctx, "proxy")
+
+	var startTimeAfter int64
+	s.Require().Eventually(func() bool {
+		startTimeAfter, err = s.getStartTime()
+		return err == nil
+	}, time.Minute, 50*time.Millisecond, "could not get start time after restart")
+	s.Require().Greater(startTimeAfter, startTimeBefore, "proxy didn't restart")
+}
+
 func (s *acceptanceSuite) TearDownSuite() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -93,6 +111,30 @@ func (s *acceptanceSuite) startMockedProxyDependency() {
 		})
 		_ = http.Serve(s.mockedDependencyListener, handler)
 	}()
+}
+
+func (s *acceptanceSuite) getStartTime() (int64, error) {
+	url := fmt.Sprintf("http://%s:8888/status", s.cfg.ServicesAddress)
+	resp, err := http.Get(url)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return 0, fmt.Errorf("status endpoint returned %d", resp.StatusCode)
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
+	statusResponse := struct {
+		StartedAt int64 `json:"started_at"`
+	}{}
+	if err := json.Unmarshal(body, &statusResponse); err != nil {
+		return 0, err
+	}
+	return statusResponse.StartedAt, nil
 }
 
 func TestAcceptanceSuite(t *testing.T) {
