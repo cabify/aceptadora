@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.5] - 2025-01-27
+### Update
+- Bump `golang.org/x/net` to `v0.34.0`
+
 ## [0.5.4] - 2024-09-02
 ### Update
 - Bump `docker/docker` to `v27.2.0`
