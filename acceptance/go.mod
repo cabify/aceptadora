@@ -1,4 +1,4 @@
-module gitlab.otters.xyz/product/journey/library/aceptadora.git/acceptance
+module acceptance
 
 go 1.22
 
