@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
@@ -118,17 +119,17 @@ func (r *Runner) createContainer(ctx context.Context) {
 }
 
 func (r *Runner) networkConnect(ctx context.Context) {
-	network := r.svc.Network
-	if network == "" {
-		network = DefaultNetwork
+	networkID := r.svc.Network
+	if networkID == "" {
+		networkID = DefaultNetwork
 	}
 
-	if _, err := r.client.NetworkInspect(ctx, network, types.NetworkInspectOptions{}); err != nil && client.IsErrNotFound(err) {
-		_, err := r.client.NetworkCreate(ctx, network, types.NetworkCreate{})
-		r.require.NoError(err, "Can't create network %q for container %q: %s", network, r.name, err)
+	if _, err := r.client.NetworkInspect(ctx, networkID, network.InspectOptions{}); err != nil && client.IsErrNotFound(err) {
+		_, err := r.client.NetworkCreate(ctx, networkID, network.CreateOptions{})
+		r.require.NoError(err, "Can't create network %q for container %q: %s", networkID, r.name, err)
 	}
-	err := r.client.NetworkConnect(ctx, network, r.container.ID, nil)
-	r.require.NoError(err, "Can't connect %q to network %q: %s", r.name, network, err)
+	err := r.client.NetworkConnect(ctx, networkID, r.container.ID, nil)
+	r.require.NoError(err, "Can't connect %q to network %q: %s", r.name, networkID, err)
 }
 
 func (r *Runner) attachAndStreamLogs(ctx context.Context) {
